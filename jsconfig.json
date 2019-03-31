@@ -1,0 +1,16 @@
+{
+    "include": [
+        "./src/**/*"
+    ],
+    "vetur.format.defaultFormatterOptions": {
+        "prettier": {
+            "semi": true,
+            "bracketSpacing": true,
+            "htmlWhiteSpaceSensitivity": "ignore"
+        },
+        "prettyhtml": {
+            "printWidth": 60, // No line exceeds 100 characters
+            "singleQuote": false // Prefer double quotes over single quotes
+        }
+    },
+}
