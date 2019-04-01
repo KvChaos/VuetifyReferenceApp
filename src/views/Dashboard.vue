@@ -3,6 +3,17 @@
     <h1 class="subheading grey--text">Dashboard</h1>
 
     <v-container class="my-5">
+      <v-layout row class="mb-3">
+        <v-flex xs12 sm12 md12 lg12>
+          <v-badge right>
+            <template v-slot:badge>
+              <span>{{projects.length}}</span>
+            </template>
+            <h2 class="grey--text text--darken-1">All Projects</h2>
+          </v-badge>
+        </v-flex>
+      </v-layout>
+
       <!-- Create buttons for sorting -->
       <v-layout row class="mb-3">
         <v-tooltip top>
@@ -38,7 +49,7 @@
           </v-flex>
           <v-flex xs6 sm4 md2>
             <div class="caption grey--text">Due Date</div>
-            <div>{{project.due}}</div>
+            <div>{{project.dueDate | mdate}}</div>
           </v-flex>
           <v-flex xs2 sm4 md2>
             <div class="right">
@@ -53,6 +64,8 @@
 </template>
 
 <script>
+import db from "@/firebase";
+
 export default {
   methods: {
     sortBy(prop) {
@@ -61,41 +74,25 @@ export default {
   },
   data() {
     return {
-      projects: [
-        {
-          title: "Design a new website",
-          person: "The Net Ninja",
-          due: "1st Jan 2019",
-          status: "ongoing",
-          content:
-            "Lorem ipsum dolor sit amet consectetur adipisicing elit. Sunt consequuntur eos eligendi illum minima adipisci deleniti, dicta mollitia enim explicabo fugiat quidem ducimus praesentium voluptates porro molestias non sequi animi!"
-        },
-        {
-          title: "Code up the homepage",
-          person: "Chun Li",
-          due: "10th Jan 2019",
-          status: "complete",
-          content:
-            "Lorem ipsum dolor sit amet consectetur adipisicing elit. Sunt consequuntur eos eligendi illum minima adipisci deleniti, dicta mollitia enim explicabo fugiat quidem ducimus praesentium voluptates porro molestias non sequi animi!"
-        },
-        {
-          title: "Design video thumbnails",
-          person: "Ryu",
-          due: "20th Dec 2018",
-          status: "complete",
-          content:
-            "Lorem ipsum dolor sit amet consectetur adipisicing elit. Sunt consequuntur eos eligendi illum minima adipisci deleniti, dicta mollitia enim explicabo fugiat quidem ducimus praesentium voluptates porro molestias non sequi animi!"
-        },
-        {
-          title: "Create a community forum",
-          person: "Gouken",
-          due: "20th Oct 2018",
-          status: "overdue",
-          content:
-            "Lorem ipsum dolor sit amet consectetur adipisicing elit. Sunt consequuntur eos eligendi illum minima adipisci deleniti, dicta mollitia enim explicabo fugiat quidem ducimus praesentium voluptates porro molestias non sequi animi!"
-        }
-      ]
+      projects: []
     };
+  },
+  created() {
+    db.collection("projects").onSnapshot(response => {
+      const changes = response.docChanges();
+
+      changes.forEach(change => {
+        if (change.type === "added") {
+          this.projects.push({
+            // Get a reference to the changed document; but it does not include the id.   So we use the spread operator
+            // so we can also add the ID.
+            // On initial load, all the documents look like 'added' documents.
+            ...change.doc.data(),
+            id: change.doc.id
+          });
+        }
+      });
+    });
   }
 };
 </script>
